@@ -8,7 +8,7 @@ neofetch with pride flags <3
 
 This repo also serves as an updated version of the original `neofetch` since the upstream [dylanaraps/neofetch](https://github.com/dylanaraps/neofetch) isn't maintained anymore and has been archived. If you only want to use the updated neofetch without pride flags, you can use the `neofetch` script from this repo. To prevent command name conflict, I call it `neowofetch` :)
 
-* Method 1: `pip install -U hyfetch` then run `neowofetch`
+* Method 1: Install HyFetch from PyPI (`pip install -U hyfetch`, `pipx install hyfetch`, or `uv tool install hyfetch`) then run `neowofetch`
 * Method 2: `npx neowofetch`
 * Method 3: `P="$HOME/.local/bin/neowofetch" && curl -L nf.hydev.org -o "$P" && chmod +x "$P"`
 * Method 4: Run without install `bash <(curl -sL nf.hydev.org)`
@@ -16,13 +16,20 @@ This repo also serves as an updated version of the original `neofetch` since the
 
 ## Installation
 
-### Method 1: Install using pip (Recommended)
+### Method 1: Install from PyPI (Recommended)
 
 Even though hyfetch has been rewritten in Rust since 2.0.0, we also published PyPI packages with prebuilt rust binaries to allow seamless transition from the Python version. You can install the rust binaries using pip:
 
 ```sh
 pip install wheel
 pip install -U hyfetch
+```
+
+For isolated command installs, you can use pipx or uv:
+
+```sh
+pipx install hyfetch
+uv tool install hyfetch
 ```
 
 If a rust binary is not available for your platform (e.g. riscv64), it will automatically fall back to the v1.99.0 Python version.
@@ -93,7 +100,7 @@ A: Most likely, the `stdout` detection is set to auto and is removing the ascii 
 
 #### Q: How can I run HyFetch on Windows?
 
-A: Install Python > 3.7 and Git > 2.42.0 first. Then, either open Git Bash terminal or install a terminal emulator that can display RGB colors (the default Windows cmd.exe cannot, but the new [Windows Terminal](https://apps.microsoft.com/detail/9N0DX20HK701?hl=en-US&gl=US) can). Then, run `pip install hyfetch` and run `hyfetch`.
+A: Install Python > 3.7 and Git > 2.42.0 first. Then, either open Git Bash terminal or install a terminal emulator that can display RGB colors (the default Windows cmd.exe cannot, but the new [Windows Terminal](https://apps.microsoft.com/detail/9N0DX20HK701?hl=en-US&gl=US) can). Then, run `pip install hyfetch`, `pipx install hyfetch`, or `uv tool install hyfetch` and run `hyfetch`.
 
 
 ## Contributing
@@ -104,7 +111,21 @@ After making changes to the source code, you can run `python -m hyfetch` in the 
 
 If they work correctly, you can commit and push these changes using git command or Github Desktop. Then, you can create a pull request on Github so that it can go into our next release!
 
-You can also install your version locally by running `pip install .` in the repo root.
+You can also install your version locally by running one of these commands in the repo root:
+
+```sh
+pip install .
+pipx install .
+uv tool install .
+```
+
+Or install directly from the GitHub source:
+
+```sh
+pip install git+https://github.com/hykilpikonna/hyfetch.git@master
+pipx install git+https://github.com/hykilpikonna/hyfetch.git@master
+uv tool install git+https://github.com/hykilpikonna/hyfetch.git@master
+```
 
 
 ## Change Log
@@ -121,11 +142,47 @@ cargo install --git https://github.com/hykilpikonna/hyfetch
 
 ### 2.1.0
 
+Changes since `2.1.0-rc1`.
+
+**✨ Features & Enhancements**
+
+* Added support for more distro logos: FiwixOS ([#356](https://github.com/hykilpikonna/hyfetch/issues/356)), Imaginary Linux ([#390](https://github.com/hykilpikonna/hyfetch/issues/390)), MidOS ([#514](https://github.com/hykilpikonna/hyfetch/pull/514)), OpenSolaris ([#513](https://github.com/hykilpikonna/hyfetch/pull/513)), and Tuxedo OS ([#333](https://github.com/hykilpikonna/hyfetch/issues/333)).
+* Added new pride presets: Enbian ([#333](https://github.com/hykilpikonna/hyfetch/issues/333)), Queer Villain ([#497](https://github.com/hykilpikonna/hyfetch/pull/497)), Demisexual ([#511](https://github.com/hykilpikonna/hyfetch/pull/511)), Paragender, Paraboy, Paragirl, Paranonbinary, and Cupio ([#506](https://github.com/hykilpikonna/hyfetch/pull/506)).
+* Added `palette_glyph` support for the macchina backend ([#501](https://github.com/hykilpikonna/hyfetch/pull/501)).
+* 🖼️ Neofetch - Added CPU codenames to processor output ([#381](https://github.com/hykilpikonna/hyfetch/issues/381)).
+* 🖼️ Neofetch - Added `glxinfo` GPU detection for systems where existing GPU detection missed hardware ([#225](https://github.com/hykilpikonna/hyfetch/issues/225)).
+* 🖼️ Neofetch - Added Steam library detection to output ([#346](https://github.com/hykilpikonna/hyfetch/issues/346)).
+* 🖼️ Neofetch - Added low-color sixel output for terminals that cannot display high-color sixels ([#404](https://github.com/hykilpikonna/hyfetch/issues/404)).
+* 🖼️ Neofetch - Added musikcube media player support through MPRIS ([#364](https://github.com/hykilpikonna/hyfetch/issues/364), [#512](https://github.com/hykilpikonna/hyfetch/pull/512)).
+* 🖼️ Neofetch - Changed memory output to report used memory instead of unavailable memory ([#117](https://github.com/hykilpikonna/hyfetch/issues/117)).
+
+**🐛 Bug Fixes**
+
+* Fixed `neowofetch` packaging so the command is installed and callable ([#499](https://github.com/hykilpikonna/hyfetch/issues/499)).
+* Fixed Windows/MSYS path escaping and neofetch lookup problems, including OpenBSD ASCII backslash handling ([#496](https://github.com/hykilpikonna/hyfetch/issues/496), [#500](https://github.com/hykilpikonna/hyfetch/issues/500)).
+* Fixed custom ASCII loading from files ([#505](https://github.com/hykilpikonna/hyfetch/pull/505)).
+* Fixed Rust wrapper newline handling regression from `2.1.0-rc1` ([#498](https://github.com/hykilpikonna/hyfetch/issues/498)).
+* Fixed macchina backend pride logo/theme output on macOS ([#503](https://github.com/hykilpikonna/hyfetch/issues/503), [#509](https://github.com/hykilpikonna/hyfetch/pull/509)).
+* Fixed the June easter egg so it exits gracefully ([#508](https://github.com/hykilpikonna/hyfetch/issues/508)).
+* 🖼️ Neofetch - Fixed ASCII whitespace handling ([#327](https://github.com/hykilpikonna/hyfetch/issues/327)).
+* 🖼️ Neofetch - Fixed CPU detection under PRoot-Distro and Android fallback behavior ([#355](https://github.com/hykilpikonna/hyfetch/issues/355), [#120](https://github.com/hykilpikonna/hyfetch/issues/120)).
+* 🖼️ Neofetch - Fixed macOS package/model detection issues, including Homebrew/pkgx/tea package counting ([#40](https://github.com/hykilpikonna/hyfetch/issues/40)).
+* 🖼️ Neofetch - Fixed Intel OEM iGPU names ([#230](https://github.com/hykilpikonna/hyfetch/issues/230)).
+* 🖼️ Neofetch - Fixed duplicate resolution output by skipping inactive DRM connectors ([#319](https://github.com/hykilpikonna/hyfetch/issues/319)).
+* 🖼️ Neofetch - Fixed package counting on openSUSE by removing the incorrect dnf fast path ([#306](https://github.com/hykilpikonna/hyfetch/issues/306)).
+* 🖼️ Neofetch - Fixed Interix hardware detection when `%WINDIR%` is not `C:\Windows` ([#507](https://github.com/hykilpikonna/hyfetch/pull/507)).
+
+**🔧 Documentation & Maintenance**
+
+* Added pipx and uv source-install instructions ([#193](https://github.com/hykilpikonna/hyfetch/issues/193)).
+* Updated Slackware installation instructions ([#495](https://github.com/hykilpikonna/hyfetch/pull/495)).
+* Fixed package build scripting and ASCII check ordering.
+* Dockerized and documented the GitHub issue moderator tooling.
+* Removed unused workflows, scripts, sample data, and editor configuration.
+
 ### 2.1.0-rc1
 
-### 2.1.0
-
-(changelog is generated by Gemini from commit history)
+(pre-release before 2.1.0, since a lot was changed)
 
 **✨ Features & Enhancements**
 

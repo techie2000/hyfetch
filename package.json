@@ -4,11 +4,14 @@
   "description": "Updated neofetch",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/hykilpikonna/neofetch.git"
+    "url": "https://github.com/hykilpikonna/hyfetch"
   },
   "bin": {
     "neowofetch": "neofetch"
   },
+  "files": [
+    "neofetch"
+  ],
   "keywords": [
     "neofetch",
     "screenfetch"
@@ -19,7 +22,7 @@
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/hykilpikonna/neofetch/issues"
+    "url": "https://github.com/hykilpikonna/hyfetch/issues"
   },
-  "homepage": "https://github.com/hykilpikonna/neofetch#readme"
+  "homepage": "https://github.com/hykilpikonna/hyfetch#readme"
 }

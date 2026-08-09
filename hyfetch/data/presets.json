@@ -43,6 +43,11 @@
     "weights": [2, 3, 1, 3],
     "comment": "sourced from https://commons.wikimedia.org/wiki/File:Demisexual_Pride_Flag.svg"
   },
+  "demiaroace": {
+    "colors": ["#000000", "#FFFFFF", "#114b7d", "#D3D3D3"],
+    "weights": [2, 3, 1, 3],
+    "comment": "sourced from https://lgbtqia.wiki/wiki/File:Demiaroace.png"
+  },
   "autosexual": ["#99D9EA", "#7F7F7F"],
   "intergender": {
     "colors": ["#900DC2", "#900DC2", "#FFE54F", "#900DC2", "#900DC2"],
@@ -232,6 +237,10 @@
   "autism":["#C94A49", "#DE7554", "#DBB667", "#6FA35D", "#2E7574", "#232828"],
   "cenelian":["#FFE7B6", "#93554A", "#52203A", "#7E4A93", "#99AFD6"],
   "transneutral":["#74DFFF", "#FFFDB3", "#FFFC75", "#FFF200", "#FFFC75", "#FFFDB3", "#FE8CBF"],
+  "enbian": {
+    "colors": ["#261F4F", "#37296B", "#3C307C", "#5141A5", "#6551B5", "#8670D1", "#AB89DD"],
+    "comment": "Sourced from https://lgbtqia.wiki/wiki/Enbian"
+  },
   "paragender": {
     "colors": ["#9C9C9C", "#FFFFFF", "#BDE4D7", "#63BFA1", "#F3EE94", "#63BFA1", "#BDE4D7", "#FFFFFF", "#9C9C9C"],
     "weights": [4, 3, 3, 2, 1, 2, 3, 3, 4]
@@ -255,6 +264,7 @@
   "cupiorose":["#A0A0A0", "#C7BFE8", "#FFFFFF", "#B6C1DC"],
   "cupioromantic":["#FCAAA4", "#FDC6C1", "#FFFFFF", "#C9C0E7", "#A1A1A1"],
   "cupiosexual":["#A0A0A0", "#C7BFE8", "#FFFFFF", "#FFB3DA"],
+  "cow":["#4FB7AC", "#FFFFFF", "#F6C0D0", "#EC758B", "#BC196A", "#520B45"],
 
   "beiyang": ["#DF1B12", "#FFC600", "#01639D", "#FFFFFF", "#000000"],
   "burger": ["#F3A26A", "#498701", "#FD1C13", "#7D3829", "#F3A26A"],
@@ -273,5 +283,15 @@
   "queervillain": {
     "colors": ["#662D91", "#8DC63F", "#F7941D", "#EC008C"],
     "comment": "Sourced from https://distressedegg.fun/qvp"
+  },
+  "barlo": {
+    "colors": ["#A1399C", "#327FDB", "#6AC343"]
+  },
+  "disability": {
+    "colors": ["#595959", "#CE717F", "#EFDD77", "#E8E8E8", "#7AC3E0", "#3CB07D","#595959"],
+    "comment": "Colorpicked from https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Visually_Safe_Disability_Pride_Flag.svg/1280px-Visually_Safe_Disability_Pride_Flag.svg.png"
+  },
+  "unlabeled": {
+    "colors": ["#E7F9E4", "#FFFFFF", "#DEF0F7", "#FAE2C3"]
   }
 }

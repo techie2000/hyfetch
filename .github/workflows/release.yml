@@ -1,115 +1,376 @@
-name: release
+name: Release
+
 on:
   push:
-    branches:
-      - "release/*"
+    tags:
+      - "[0-9]*.[0-9]*.[0-9]*"
+      - "v[0-9]*.[0-9]*.[0-9]*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Existing release tag to publish, such as 2.1.1 or v2.1.1"
+        required: true
+        type: string
+      source_ref:
+        description: "Ref to build/publish from. Leave empty to use the release tag; set to master/a branch for recovery fixes."
+        required: false
+        default: ""
+        type: string
+      create_github_release:
+        description: "Create or complete the GitHub Release"
+        required: true
+        default: true
+        type: boolean
+      publish_pypi:
+        description: "Publish the Python distributions to PyPI"
+        required: true
+        default: true
+        type: boolean
+      publish_npm:
+        description: "Publish package.json to npm"
+        required: true
+        default: true
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+  cancel-in-progress: false
 
 jobs:
-  testing:
-    name: testing release
-    runs-on: ubuntu-latest
-    if: ${{ !startsWith(github.event.head_commit.message,'release') }}
-
+  metadata:
+    name: Validate release metadata
+    runs-on: ubuntu-22.04
+    outputs:
+      tag: ${{ steps.metadata.outputs.tag }}
+      source_ref: ${{ steps.release-refs.outputs.source_ref }}
+      version: ${{ steps.metadata.outputs.version }}
+      python_package: ${{ steps.metadata.outputs.python_package }}
+      npm_package: ${{ steps.metadata.outputs.npm_package }}
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Get tags
-        run: git fetch --all --tags
-
-      - name: Get version
+      - name: Resolve release refs
+        id: release-refs
         run: |
-              BRANCH=$(git symbolic-ref --short HEAD)
-              VER=${BRANCH#*release/}
-              if [[ $(git tag | grep ${VER}rc) ]];then
-                TAGS=$(git tag | grep ${VER}rc | awk 'END {print}')
-                REL=${TAGS##*rc}
-                let REL++
-              else
-                REL=1
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "tag=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+            if [[ -n "${{ inputs.source_ref }}" ]]; then
+              echo "source_ref=${{ inputs.source_ref }}" >> "$GITHUB_OUTPUT"
+            else
+              echo "source_ref=${{ inputs.tag }}" >> "$GITHUB_OUTPUT"
+            fi
+          else
+            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "source_ref=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.release-refs.outputs.source_ref }}
+
+      - name: Validate checked-in versions
+        id: metadata
+        run: python3 tools/release.py metadata --tag "${{ steps.release-refs.outputs.tag }}"
+
+  release-state:
+    name: Check completed release stages
+    runs-on: ubuntu-22.04
+    needs: metadata
+    outputs:
+      pypi_exists: ${{ steps.state.outputs.pypi_exists }}
+      npm_exists: ${{ steps.state.outputs.npm_exists }}
+      github_release_exists: ${{ steps.state.outputs.github_release_exists }}
+      github_release_complete: ${{ steps.state.outputs.github_release_complete }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.metadata.outputs.source_ref }}
+
+      - name: Query registries and GitHub Release
+        id: state
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          python3 tools/release.py state \
+            --tag "${{ needs.metadata.outputs.tag }}" \
+            --version "${{ needs.metadata.outputs.version }}" \
+            --python-package "${{ needs.metadata.outputs.python_package }}" \
+            --npm-package "${{ needs.metadata.outputs.npm_package }}" \
+            --repo "${{ github.repository }}"
+
+      - name: Summarize release state
+        run: |
+          {
+            echo "## Release state"
+            echo
+            echo "| Stage | Already complete |"
+            echo "| --- | --- |"
+            echo "| PyPI | ${{ steps.state.outputs.pypi_exists }} |"
+            echo "| npm | ${{ steps.state.outputs.npm_exists }} |"
+            echo "| GitHub Release assets | ${{ steps.state.outputs.github_release_complete }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  preflight:
+    name: Preflight release stages
+    runs-on: ubuntu-22.04
+    needs:
+      - metadata
+      - release-state
+    steps:
+      - name: Verify pending publish stages
+        env:
+          CREATE_GITHUB_RELEASE: ${{ github.event_name != 'workflow_dispatch' || inputs.create_github_release }}
+          PUBLISH_PYPI: ${{ github.event_name != 'workflow_dispatch' || inputs.publish_pypi }}
+          PUBLISH_NPM: ${{ github.event_name != 'workflow_dispatch' || inputs.publish_npm }}
+        run: |
+          pending=()
+          skipped=()
+
+          if [[ "$CREATE_GITHUB_RELEASE" == "true" ]]; then
+            if [[ "${{ needs.release-state.outputs.github_release_complete }}" == "true" ]]; then
+              skipped+=("GitHub Release")
+            else
+              pending+=("GitHub Release")
+            fi
+          fi
+
+          if [[ "$PUBLISH_PYPI" == "true" ]]; then
+            if [[ "${{ needs.release-state.outputs.pypi_exists }}" == "true" ]]; then
+              skipped+=("PyPI")
+            else
+              pending+=("PyPI")
+            fi
+          fi
+
+          if [[ "$PUBLISH_NPM" == "true" ]]; then
+            if [[ "${{ needs.release-state.outputs.npm_exists }}" == "true" ]]; then
+              skipped+=("npm")
+            else
+              pending+=("npm")
+            fi
+          fi
+
+          {
+            echo "## Preflight"
+            echo
+            if ((${#pending[@]})); then
+              printf 'Pending stages: %s\n\n' "$(IFS=', '; echo "${pending[*]}")"
+            else
+              echo "No pending stages."
+              echo
+            fi
+            if ((${#skipped[@]})); then
+              printf 'Already complete: %s\n\n' "$(IFS=', '; echo "${skipped[*]}")"
+            fi
+            echo "PyPI and npm publishing use trusted publishing/OIDC; no registry secrets are required."
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  build-python-dist:
+    name: Build Python distributions
+    runs-on: ubuntu-22.04
+    needs:
+      - metadata
+      - release-state
+      - preflight
+    if: >-
+      ${{
+        always()
+        && needs.preflight.result == 'success'
+        && (
+          (
+            (github.event_name != 'workflow_dispatch' || inputs.publish_pypi)
+            && needs.release-state.outputs.pypi_exists != 'true'
+          )
+          || (
+            (github.event_name != 'workflow_dispatch' || inputs.create_github_release)
+            && needs.release-state.outputs.github_release_complete != 'true'
+          )
+        )
+      }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.metadata.outputs.source_ref }}
+
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y help2man libarchive-tools shellcheck unzip wget zip
+          python -m pip install --upgrade pip
+          python -m pip install build twine
+
+      - name: Build and check distributions
+        run: tools/build_pkg.sh
+
+      - name: Upload distribution artifact
+        uses: actions/upload-artifact@v7
+        with:
+          name: python-dist-${{ needs.metadata.outputs.version }}
+          path: dist/*
+          if-no-files-found: error
+
+  github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-22.04
+    needs:
+      - metadata
+      - release-state
+      - preflight
+      - build-python-dist
+    permissions:
+      contents: write
+    if: >-
+      ${{
+        always()
+        && needs.preflight.result == 'success'
+        && needs.build-python-dist.result == 'success'
+        && (github.event_name != 'workflow_dispatch' || inputs.create_github_release)
+        && needs.release-state.outputs.github_release_complete != 'true'
+      }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ needs.metadata.outputs.source_ref }}
+
+      - uses: actions/download-artifact@v8
+        with:
+          name: python-dist-${{ needs.metadata.outputs.version }}
+          path: dist
+
+      - name: Write release notes
+        run: |
+          python3 tools/release.py changelog \
+            --version "${{ needs.metadata.outputs.version }}" \
+            --output RELEASE_NOTES.md
+
+      - name: Create or update release metadata
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.metadata.outputs.tag }}
+          VERSION: ${{ needs.metadata.outputs.version }}
+        run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            echo "GitHub Release $TAG already exists."
+            gh release edit "$TAG" \
+              --title "$VERSION" \
+              --notes-file RELEASE_NOTES.md
+          else
+            gh release create "$TAG" \
+              --verify-tag \
+              --title "$VERSION" \
+              --notes-file RELEASE_NOTES.md
+          fi
+
+      - name: Upload missing release assets
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          TAG: ${{ needs.metadata.outputs.tag }}
+        run: |
+          mapfile -t existing_assets < <(gh release view "$TAG" --json assets --jq '.assets[].name')
+          missing_assets=()
+
+          for file in dist/*; do
+            name="$(basename "$file")"
+            found=false
+            for existing in "${existing_assets[@]}"; do
+              if [[ "$existing" == "$name" ]]; then
+                found=true
+                break
               fi
-              echo "BUILDVER=${VER}rc${REL}" >> $GITHUB_ENV
+            done
 
-      - name: Update versions
-        run: |
-              sed -i "/^ *VERSION = /cVERSION = '${{ env.BUILDVER }}'" hyfetch/constants.py
+            if [[ "$found" == "false" ]]; then
+              missing_assets+=("$file")
+            fi
+          done
 
-      - name: Making tags
-        run: |
-              git config user.name github-actions
-              git config user.email github-actions@github.com
-              git stage .
-              git commit -m "tagged unstable ${{ env.BUILDVER }}"
-              git tag --force ${{ env.BUILDVER }}
+          if ((${#missing_assets[@]} == 0)); then
+            echo "All release assets are already uploaded."
+          else
+            gh release upload "$TAG" "${missing_assets[@]}"
+          fi
 
-      - name: Upload changes
-        run: |
-              git pull && git push && git push --tags
-
-      - name: Deploy to PYPI
-        uses: casperdcl/deploy-pypi@v2
-        with:
-          password: ${{ secrets.PYPI_API_TOKEN }}
-          pip: wheel -w dist/ --no-deps .
-
-  release:
-    name: formal release
-    runs-on: ubuntu-latest
-    if: ${{ startsWith(github.event.head_commit.message,'release') }}
-
+  publish-pypi:
+    name: Publish to PyPI
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      id-token: write
+    needs:
+      - metadata
+      - release-state
+      - preflight
+      - build-python-dist
+    if: >-
+      ${{
+        always()
+        && needs.preflight.result == 'success'
+        && needs.build-python-dist.result == 'success'
+        && (github.event_name != 'workflow_dispatch' || inputs.publish_pypi)
+        && needs.release-state.outputs.pypi_exists != 'true'
+      }}
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+      - uses: actions/download-artifact@v8
         with:
-          fetch-depth: 0
+          name: python-dist-${{ needs.metadata.outputs.version }}
+          path: dist
 
-      - name: Get version
-        run: |
-              BRANCH=$(git symbolic-ref --short HEAD)
-              echo "BUILDVER=${BRANCH#*release/}" >> $GITHUB_ENV
-
-      - name: Update package.json
-        uses: jossef/action-set-json-field@v2
+      - name: Publish distributions
+        uses: pypa/gh-action-pypi-publish@v1.14.0
         with:
-          file: package.json
-          field: version
-          value: ${{ env.BUILDVER }}
+          packages-dir: dist
+          skip-existing: true
 
-      - name: Update neofetch version
-        run: |
-              REVISION=$(expr $(git rev-list --count HEAD neofetch) - 2902)
-              sed -i "/^ *version=/cversion=7.4.0r${REVISION}" neofetch
-
-      - name: Update other versions
-        run: |
-              sed -i "/^ *VERSION = /cVERSION = '${{ env.BUILDVER }}'" hyfetch/constants.py
-              sed -i "/^ *### Unpublished/c### ${{ env.BUILDVER }}" README.md
-
-      - name: Make final tags
-        run: |
-              git config user.name github-actions
-              git config user.email github-actions@github.com
-              git stage . && git commit -m "tagged stable ${{ env.BUILDVER }}"
-              git tag --force ${{ env.BUILDVER }}
-
-      - name: Merge branch and push
-        run: |
-              parent=$(git show-branch \
-                      | grep -F '*' \
-                      | grep -v "$(git rev-parse --abbrev-ref HEAD)" \
-                      | head -n1 \
-                      | sed 's/.*\[\(.*\)\].*/\1/' \
-                      | sed 's/[\^~].*//')
-              git checkout ${parent}
-              git merge release/${{ env.BUILDVER }} --allow-unrelated-histories
-              git pull --all && git push --all && git push --tags
-
-      - name: Generate changelog from README
-        run: (sed '0,/^ *### ${{ env.BUILDVER }}/d;/^ *#/,$d' <README.md)>temp_CHANGELOG.md
-
-      - name: Publish release
-        uses: ncipollo/release-action@v1
+  publish-npm:
+    name: Publish to npm
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+      id-token: write
+    needs:
+      - metadata
+      - release-state
+      - preflight
+    if: >-
+      ${{
+        always()
+        && needs.preflight.result == 'success'
+        && (github.event_name != 'workflow_dispatch' || inputs.publish_npm)
+        && needs.release-state.outputs.npm_exists != 'true'
+      }}
+    steps:
+      - uses: actions/checkout@v6
         with:
-          bodyFile: "temp_CHANGELOG.md"
-          tag: ${{ env.BUILDVER }}
-          token: ${{ secrets.GH_TOKEN }}
+          ref: ${{ needs.metadata.outputs.source_ref }}
+
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          package-manager-cache: false
+
+      - name: Use npm with trusted publishing support
+        run: npm install -g npm@11
+
+      - name: Confirm npm version is still unpublished
+        id: npm-state
+        env:
+          NPM_PACKAGE: ${{ needs.metadata.outputs.npm_package }}
+          VERSION: ${{ needs.metadata.outputs.version }}
+        run: |
+          if npm view "$NPM_PACKAGE@$VERSION" version --registry https://registry.npmjs.org >/dev/null 2>&1; then
+            echo "$NPM_PACKAGE@$VERSION is already published; skipping."
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+          echo "exists=false" >> "$GITHUB_OUTPUT"
+
+      - name: Publish package
+        if: steps.npm-state.outputs.exists != 'true'
+        run: npm publish --provenance

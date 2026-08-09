@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-FASTFETCH_VERSION="2.61.0"
+FASTFETCH_VERSION="2.63.1"
 FASTFETCH_DL="https://github.com/fastfetch-cli/fastfetch/releases/download/$FASTFETCH_VERSION/"
 
 # Get script directory
@@ -85,7 +85,7 @@ function build_for_platform() {
     rust_platform=$3
 
     echo "Building for $ff_platform"
-    
+
     # Download the fastfetch binary
     wget "$FASTFETCH_DL/fastfetch-$ff_platform.zip" -O "fastfetch-$ff_platform.zip"
 

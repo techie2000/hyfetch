@@ -35,7 +35,7 @@ pub struct Options {
     #[cfg(feature = "macchina")]
     pub palette_glyph: Option<String>,
     #[cfg(feature = "macchina")]
-    pub palette_type: Option<String>
+    pub palette_type: Option<String>,
 }
 
 pub fn options() -> OptionParser<Options> {
@@ -55,7 +55,7 @@ pub fn options() -> OptionParser<Options> {
                     .join("hyfetch.json"),
             )
         })
-        .debug_fallback();
+        .format_fallback(|_, f| f.write_str("~/.config/hyfetch.json"));
     let preset = long("preset")
         .short('p')
         .help(&*format!(

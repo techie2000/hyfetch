@@ -181,7 +181,7 @@ uptime_shorthand="on"
 
 # Show memory percentage in output.
 #
-# Default: 'off'
+# Default: 'on'
 # Values:  'on', 'off'
 # Flag:    --memory_percent
 #
@@ -190,9 +190,19 @@ uptime_shorthand="on"
 # off:  '1801MiB / 7881MiB'
 memory_percent="on"
 
+# Report Linux used memory from MemAvailable.
+#
+# Default: 'off'
+# Values:  'on', 'off'
+# Flag:    --memory_report_available
+#
+# on:  Calculate used memory as 'MemTotal - MemAvailable'
+# off: Calculate used memory as 'MemTotal + Shmem - MemFree - Buffers - Cached - SReclaimable'
+memory_report_available="off"
+
 # Change memory output unit.
 #
-# Default: 'mib'
+# Default: 'gib'
 # Values:  'kib', 'mib', 'gib', 'tib'
 # Flag:    --memory_unit
 #
@@ -214,7 +224,7 @@ mem_precision=2
 
 # Show/Hide Package Manager names.
 #
-# Default: 'tiny'
+# Default: 'on'
 # Values:  'on', 'tiny' 'off'
 # Flag:    --package_managers
 #
@@ -312,7 +322,7 @@ speed_type="bios_limit"
 
 # CPU speed shorthand
 #
-# Default: 'off'
+# Default: 'on'
 # Values: 'on', 'off'.
 # Flag:    --speed_shorthand
 # NOTE: This flag is not supported in systems with CPU speed less than 1 GHz
@@ -332,6 +342,19 @@ speed_shorthand="on"
 # on:   'Intel i7-6500U'
 # off:  'i7-6500U (4)'
 cpu_brand="on"
+
+# CPU Codename
+# Hide/Show CPU codename.
+#
+# Default: 'off'
+# Values:  'on', 'off'
+# Flag:    --cpu_codename
+# Supports: Linux with Intel x86 CPUs
+#
+# Example:
+# on:  'Intel i7-8700K [Coffee Lake] (12) @ 3.7GHz'
+# off: 'Intel i7-8700K (12) @ 3.7GHz'
+cpu_codename="off"
 
 # CPU Speed
 # Hide/Show CPU speed.
@@ -391,6 +414,16 @@ cpu_temp="off"
 # off: 'HD 7950'
 gpu_brand="on"
 
+# Which GPU backend to use
+#
+# Default: 'lspci'
+# Values:  'lspci', 'glxinfo'
+# Flag:    --gpu_backend
+# Supports: Linux
+#
+# NOTE: 'glxinfo' only reports the GPU attached to the current display.
+gpu_backend="lspci"
+
 # Which GPU to display
 #
 # Default: 'all'
@@ -415,7 +448,7 @@ gpu_type="all"
 
 
 # Display refresh rate next to each monitor
-# Default: 'off'
+# Default: 'on'
 # Values:  'on', 'off'
 # Flag:    --refresh_rate
 # Supports: Doesn't work on Windows.
@@ -836,8 +869,8 @@ disk_display="off"
 #
 # Default:  'ascii'
 # Values:   'ascii', 'caca', 'catimg', 'chafa', 'jp2a', 'iterm2', 'off',
-#           'pot', 'termpix', 'pixterm', 'tycat', 'w3m', 'kitty', 'ueberzug',
-#           'viu'
+#           'pot', 'termpix', 'pixterm', 'sixel', 'lowsixel', 'tycat', 'w3m',
+#           'kitty', 'ueberzug', 'viu'
 
 # Flag:     --backend
 image_backend="ascii"
@@ -888,7 +921,7 @@ image_source="auto"
 # LinuxFromScratch, Live Raizo, LMDE, Lubuntu, Lunar, mac, MacaroniOS, Mageia, Magix, MagpieOS,
 # MainsailOS, Mandriva, Manjaro, MassOS, MatuusOS, Maui, Mauna, Meowix, Mer, MidOS, Minix,
 # MIRACLE LINUX, MX, Namib, NekOS, Neptune, NetBSD, Netrunner, Nitrux, NixOS, nixos_colorful,
-# Nobara, NomadBSD,
+# NixOwOS, Nobara, NomadBSD,
 # Nurunner, NuTyX, Obarun, OBRevenge, OmniOS, Open Source Media Center, OpenBSD, openEuler,
 # OpenIndiana, openKylin, openmamba, OpenMandriva, OpenSolaris, OpenStage, openSUSE, openSUSE
 # Leap, openSUSE Tumbleweed, openSUSE Tumbleweed-Slowroll, OPNsense, Oracle, orchid, OS Elbrus,
@@ -900,8 +933,8 @@ image_source="auto"
 # Rosa, Sabayon, sabotage, Sailfish, SalentOS, Salient OS, Salix, Sasanqua, Scientific, secureblue,
 # semc, Septor, Serene, SharkLinux, ShastraOS, Siduction, SkiffOS, Slackel, Slackware, SliTaz,
 # SmartOS, Soda, Solus, Source Mage, Sparky, Star, SteamOS, Stock Linux, Sulin, SunOS, SwagArch, t2,
-# Tails, Tatra, TeArch, TorizonCore, Trisquel, Twister, Ubuntu, Ubuntu Budgie, Ubuntu Cinnamon,
-# Ubuntu Kylin, Ubuntu MATE, Ubuntu Studio, Ubuntu Sway, Ubuntu Touch, Ubuntu-GNOME, ubuntu_old02,
+# Tails, Tatra, TeArch, TorizonCore, Trisquel, Twister, Tuxedo OS, Ubuntu, Ubuntu Budgie,
+# Ubuntu Cinnamon, Ubuntu Kylin, Ubuntu MATE, Ubuntu Studio, Ubuntu Sway, Ubuntu Touch, Ubuntu-GNOME, ubuntu_old02,
 # Ultramarine Linux, unicodearch, Univalent, Univention, Uos, UrukOS, uwuntu, Vanilla, Venom, VNux,
 # Void, VzLinux, wii-linux-ngx, Windows, Windows 10, Windows 11, Windows95, Wrt, Xenia, Xenia2,
 # XFerience, Xray_OS, Xubuntu, yiffOS, Zirconium, Zorin have ascii logos.
@@ -1047,6 +1080,7 @@ get_os() {
         AIX)      os=AIX ;;
         IRIX*)    os=IRIX ;;
         FreeMiNT) os=FreeMiNT ;;
+        Fiwix)    os=Fiwix ;;
         Interix)  os=Interix ;;
         Ironclad) os=Ironclad;;
         OSF1)     os=digitalUNIX ;;
@@ -1077,7 +1111,7 @@ get_distro() {
     [[ $distro ]] && return
 
     case $os in
-        Linux|BSD|MINIX|Ironclad)
+        Linux|BSD|MINIX|Ironclad|Fiwix)
             if [[ -f /bedrock/etc/bedrock-release && -z $BEDROCK_RESTRICT ]]; then
                 case $distro_shorthand in
                     on|tiny) distro="Bedrock Linux" ;;
@@ -1134,10 +1168,11 @@ get_distro() {
                 esac
 
             elif [[ -f /etc/NIXOS ]]; then
+                . /etc/os-release
                 case $distro_shorthand in
-                    on) distro="NixOS $(nixos-version | awk '{print substr($1,0,5),$2}')" ;;
-                    tiny) distro="NixOS" ;;
-                    *) distro="NixOS $(nixos-version)" ;;
+                    on) distro="${NAME} ${VERSION}" ;;
+                    tiny) distro="${NAME}" ;;
+                    *) distro="${NAME} $(nixos-version)" ;;
                 esac
 
             elif [[ -f /etc/linspire-version ]]; then
@@ -1695,7 +1730,8 @@ get_model() {
                     MacPro4,1):             "Mac Pro (Early 2009)" ;;
                     iMac21,[1-2]):          "iMac (24-inch, M1, 2021)" ;;
                     iMac20,[1-2]):          "iMac (Retina 5K, 27-inch, 2020)" ;;
-                    iMac19,[1-2]):          "iMac (Retina 4K, 21.5-inch, 2019)" ;;
+                    iMac19,1):              "iMac (Retina 5K, 27-inch, 2019)" ;;
+                    iMac19,2):              "iMac (Retina 4K, 21.5-inch, 2019)" ;;
                     iMacPro1,1):            "iMac Pro (2017)" ;;
                     iMac18,3):              "iMac (Retina 5K, 27-inch, 2017)" ;;
                     iMac18,2):              "iMac (Retina 4K, 21.5-inch, 2017)" ;;
@@ -2116,6 +2152,63 @@ get_packages() {
             pac "$((pkgs-pkgs_h))";
         fi
     }
+    pkgx_packages=0
+    tea_packages=0
+    is_external_package_manager() {
+        case $1 in
+            pkgx) ((pkgx_packages > 0)) ;;
+            tea)  ((tea_packages > 0)) ;;
+            *)    return 1 ;;
+        esac
+    }
+    count_brew_packages() {
+        local brew_cellar brew_caskroom package path
+        local -a brew_pkgs filtered_pkgs
+
+        brew_cellar=$(brew --cellar) || return
+        brew_caskroom=$(brew --caskroom) || brew_caskroom=
+
+        if shopt -q nullglob; then
+            brew_pkgs=("$brew_cellar"/*)
+            [[ $brew_caskroom ]] && brew_pkgs+=("$brew_caskroom"/*)
+        else
+            shopt -s nullglob
+            brew_pkgs=("$brew_cellar"/*)
+            [[ $brew_caskroom ]] && brew_pkgs+=("$brew_caskroom"/*)
+            shopt -u nullglob
+        fi
+
+        for path in "${brew_pkgs[@]}"; do
+            package=${path##*/}
+            is_external_package_manager "$package" && continue
+            filtered_pkgs+=("$path")
+        done
+
+        dir "${filtered_pkgs[@]}"
+    }
+    count_pkgx_packages() {
+        local packages_before pkgx_pkgs
+
+        packages_before=${packages:-0}
+
+        if has pkgx && [[ -d "$HOME/.local/bin" ]]; then
+            pkgx_pkgs="$(
+                awk '
+                    match($0, /exec pkgx \+[^ ]+/) {
+                        prefix = "exec pkgx +"
+                        print substr($0, RSTART + length(prefix), RLENGTH - length(prefix))
+                    }
+                ' "$HOME"/.local/bin/* 2>/dev/null | sort -u
+            )"
+            [[ $pkgx_pkgs ]] && tot printf "%s\n" "$pkgx_pkgs"
+        fi
+        ((pkgx_packages+=packages-packages_before))
+
+        packages_before=${packages:-0}
+        has tea && [[ -d "$HOME/.tea" ]] &&
+            tot find "$HOME/.tea" -maxdepth 2 -mindepth 2 -type d
+        ((tea_packages+=packages-packages_before))
+    }
 
     # Redefine tot() and dir() for Bedrock Linux.
     [[ -f /bedrock/etc/bedrock-release && $PATH == */bedrock/cross/* ]] && {
@@ -2177,12 +2270,7 @@ get_packages() {
         fi
     fi
 
-    if has pkgx && [[ -d "$HOME/.local/bin" ]]; then
-        # https://github.com/pkgxdev/pkgx/issues/985#issuecomment-2080999008
-        _pkgxpkgs="$(grep -rIhoP 'exec pkgx \+\K[^ ]+' "$HOME/.local/bin" | sort -u)"
-        tot echo "$_pkgxpkgs"
-        unset _pkgxpkgs
-    fi
+    count_pkgx_packages
 
     # OS-specific package managers.
     case $os in
@@ -2225,12 +2313,7 @@ get_packages() {
 
             has port       && pkgs_h=1 tot port installed && ((packages-=1))
 
-            # Using the dnf package cache is much faster than rpm.
-            if has dnf && type -p sqlite3 >/dev/null && [[ -f /var/cache/dnf/packages.db ]]; then
-                pac "$(sqlite3 /var/cache/dnf/packages.db "SELECT count(pkg) FROM installed")"
-            else
-                has rpm && tot rpm -qa --nodigest --nosignature
-            fi
+            has rpm && tot rpm -qa --nodigest --nosignature
 
             # 'mine' conflicts with minesweeper games.
             [[ -f /etc/SDE-VERSION ]] &&
@@ -2242,7 +2325,7 @@ get_packages() {
             # shellcheck disable=SC2086
             {
             shopt -s nullglob
-            has brew    && dir "$(brew --cellar)/* $(brew --caskroom)/*"
+            has brew    && count_brew_packages
             has emerge  && dir "/var/db/pkg/*/*"
             has Compile && dir "/Programs/*/"
             has eopkg   && dir "/var/lib/eopkg/package/*"
@@ -2260,13 +2343,51 @@ get_packages() {
 
             if [[ -z "$package_minimal" ]]; then
                 # Steam games
-                STEAM_P=".local/share/Steam/steamapps/common"
-                if [[ -d "$HOME/$STEAM_P" ]]; then
-                    manager=steam && dir "$HOME/$STEAM_P/*/"
-                elif [[ -d "$HOME/.var/app/com.valvesoftware.Steam/$STEAM_P" ]]; then
-                    manager=steam && dir "$HOME/.var/app/com.valvesoftware.Steam/$STEAM_P/*/"
-                elif [[ -d "$HOME/.steam/steam/steamapps/common" ]]; then
-                    manager=steam && dir "$HOME/.steam/steam/steamapps/common/*/"
+                steam_common_dirs=()
+                steam_add_library() {
+                    local steam_common_dir="$1/steamapps/common"
+                    local steam_existing
+
+                    [[ -d "$steam_common_dir" ]] || return
+                    steam_common_dir="$(cd "$steam_common_dir" && pwd -P)" || return
+
+                    for steam_existing in "${steam_common_dirs[@]}"; do
+                        [[ "$steam_existing" == "$steam_common_dir" ]] && return
+                    done
+
+                    steam_common_dirs+=("$steam_common_dir")
+                }
+
+                for steam_root in \
+                    "$HOME/.local/share/Steam" \
+                    "$HOME/.var/app/com.valvesoftware.Steam/.local/share/Steam" \
+                    "$HOME/.steam/steam" \
+                    "$HOME/.steam/root"
+                do
+                    steam_library_file="$steam_root/steamapps/libraryfolders.vdf"
+
+                    if [[ -f "$steam_library_file" ]]; then
+                        while IFS= read -r steam_library; do
+                            steam_add_library "$steam_library"
+                        done < <(awk -F '"' '
+                            /"path"[[:space:]]+"/ { print $4; next }
+                            /^[[:space:]]*"[0-9]+"[[:space:]]+"/ && $4 ~ /^\// { print $4 }
+                        ' "$steam_library_file")
+                    fi
+
+                    steam_add_library "$steam_root"
+                done
+
+                steam_packages=0
+                for steam_common_dir in "${steam_common_dirs[@]}"; do
+                    steam_games=("$steam_common_dir"/*/)
+                    [[ -e "${steam_games[0]}" ]] && ((steam_packages+=${#steam_games[@]}))
+                done
+
+                if ((steam_packages > 0)); then
+                    ((packages+=steam_packages))
+                    manager=steam
+                    pac "$steam_packages"
                 fi
             fi
 
@@ -2373,7 +2494,7 @@ get_packages() {
 
         "Mac OS X"|"macOS"|MINIX)
             has port  && pkgs_h=1 tot port installed && ((packages-=1))
-            has brew  && dir "$(brew --cellar)/* $(brew --caskroom)/*"
+            has brew  && count_brew_packages
             has pkgin && tot pkgin list
             has dpkg  && tot dpkg-query -f '.\n' -W
 
@@ -3036,6 +3157,8 @@ get_wm_theme() {
 }
 
 get_cpu() {
+    cpu_codename_label=
+
     case $os in
         "Ironclad")
             cpu="$(cpuinfo -n) ($(cpuinfo -c)) @ $(cpuinfo -f)"
@@ -3071,10 +3194,33 @@ get_cpu() {
                 ;;
 
                 "arm"* | "aarch64")
-                    if [[ $(trim "$distro") == Android* ]]; then
-                        # Android roms have modified cpuinfo that shows CPU model as a string
+                    if [[ $(trim "$distro") == Android* ]] || [[ -d /system/app && -d /system/priv-app ]]; then
+                        # Android and Termux PRoot sessions can expose a useful SoC name here.
                         cpu="$(awk -F':' '/Hardware/ {print $2; exit}' "$cpu_file")"
-                    else
+
+                        if [[ -z "$cpu" ]]; then
+                            getprop_cmd=
+
+                            if command -v getprop &> /dev/null; then
+                                getprop_cmd="$(command -v getprop)"
+                            elif [[ -x /system/bin/getprop ]]; then
+                                getprop_cmd="/system/bin/getprop"
+                            fi
+
+                            if [[ "$getprop_cmd" ]]; then
+                                cpu="$("$getprop_cmd" ro.soc.model 2>/dev/null)"
+                                [[ -z "$cpu" ]] && cpu="$("$getprop_cmd" ro.product.oplus.cpuinfo 2>/dev/null)"
+
+                                case ${cpu,,} in
+                                    "sm8350") cpu="Qualcomm Snapdragon 888" ;;
+                                    "sm8350-ac") cpu="Qualcomm Snapdragon 888+" ;;
+                                    sm*) cpu="Qualcomm ${cpu^^}" ;;
+                                esac
+                            fi
+                        fi
+                    fi
+
+                    if [[ -z "$cpu" ]] && command -v lscpu &> /dev/null; then
                         # ARM linux displays binary model code in cpuinfo, which needs to be decoded with lscpu
                         if ! command -v python3 &> /dev/null; then
                             cpu="$(lscpu | awk -F': ' '/Vendor ID/ {print $2; exit}' ) $(lscpu | awk -F': ' '/Model name/ {print $2; exit}')"
@@ -3122,11 +3268,13 @@ if __name__ == '__main__':
     print('\n'.join(cpus))
 END
                             tmp_cpus=$(python3 -c "$py_script")
-                            while IFS= read -r line; do
-                                prin "${subtitle:+${subtitle}}" "$line"
-                            done <<< "$tmp_cpus"
+                            if [[ "$tmp_cpus" ]]; then
+                                while IFS= read -r line; do
+                                    prin "${subtitle:+${subtitle}}" "$line"
+                                done <<< "$tmp_cpus"
 
-                            return
+                                return
+                            fi
                         fi
                     fi
                 ;;
@@ -3135,6 +3283,7 @@ END
             # If cpu is not detected on a platform-specific bases, fallback to cpuinfo method
             [[ -z "$cpu" ]] && cpu="$(awk -F '\\s*: | @' '/model name|Model|uarch|Hardware|Processor|^cpu model|chip type|^cpu type/ { print $2; exit}' "$cpu_file")"
             [[ -z "$cpu" ]] && cpu="$(awk -F '\\s*: | @' '/Hardware/ {print $2; exit}' "$cpu_file")"
+            cpu_codename_label="$(get_cpu_codename "$cpu_file")"
 
             speed_dir="/sys/devices/system/cpu/cpu0/cpufreq"
 
@@ -3440,6 +3589,10 @@ END
         cpu="${cpu/Qualcomm }"
     fi
 
+    # Add CPU codename to the output.
+    [[ "$cpu_codename" == "on" && "$cpu_codename_label" ]] && \
+        cpu="$cpu [$cpu_codename_label]"
+
     # Add CPU cores to the output.
     [[ "$cpu_cores" != "off" && "$cores" ]] && \
         case $os in
@@ -3484,25 +3637,137 @@ END
     fi
 }
 
+get_cpu_codename() {
+    local cpu_file="${1:-/proc/cpuinfo}"
+    local vendor_id family model stepping cpu_codename_label
+
+    [[ -r "$cpu_file" ]] || return
+
+    IFS=$'\t' read -r vendor_id family model stepping < <(
+        awk -F ': *' '
+            /^vendor_id[[:space:]]*:/ {vendor_id=$2}
+            /^cpu family[[:space:]]*:/ {family=$2}
+            /^model[[:space:]]*:/ {model=$2}
+            /^stepping[[:space:]]*:/ {stepping=$2}
+            vendor_id && family && model && stepping {
+                print vendor_id "\t" family "\t" model "\t" stepping
+                found=1
+                exit
+            }
+            END {
+                if (!found) {
+                    print vendor_id "\t" family "\t" model "\t" stepping
+                }
+            }
+        ' "$cpu_file"
+    )
+
+    [[ "$vendor_id" == "GenuineIntel" ]] || return
+
+    [[ "$family" && "$model" ]] || return
+
+    # Intel display family/model table, derived from cpufetch src/x86/uarch.c.
+    # Linux /proc/cpuinfo already exposes the display model as decimal.
+    case "$family:$model:$stepping" in
+        "5:9:0" | "5:10:0") cpu_codename_label="Lakemont" ;;
+        "6:78:8" | "6:94:8") cpu_codename_label="Kaby Lake" ;;
+        "6:85:6" | "6:85:7") cpu_codename_label="Cascade Lake" ;;
+        "6:85:10") cpu_codename_label="Cooper Lake" ;;
+        "6:142:11") cpu_codename_label="Whiskey Lake" ;;
+        "6:143:8") cpu_codename_label="Sapphire Rapids" ;;
+        "6:158:9") cpu_codename_label="Kaby Lake" ;;
+        "6:158:10" | "6:158:11" | "6:158:12" | "6:158:13") cpu_codename_label="Coffee Lake" ;;
+    esac
+
+    if [[ -z "$cpu_codename_label" ]]; then
+        case "$family:$model" in
+            "4:0" | "4:1") cpu_codename_label="i80486DX" ;;
+            "4:2") cpu_codename_label="i80486SX" ;;
+            "4:3") cpu_codename_label="i80486DX2" ;;
+            "4:4") cpu_codename_label="i80486SL" ;;
+            "4:5") cpu_codename_label="i80486SX2" ;;
+            "4:7") cpu_codename_label="i80486DX2WB" ;;
+            "4:8") cpu_codename_label="i80486DX4" ;;
+            "4:9") cpu_codename_label="i80486DX4WB" ;;
+            "5:0" | "5:1") cpu_codename_label="P5" ;;
+            "5:2" | "5:7") cpu_codename_label="P54C" ;;
+            "5:3") cpu_codename_label="P24T (Overdrive)" ;;
+            "5:4") cpu_codename_label="P55C (MMX)" ;;
+            "5:8") cpu_codename_label="Tillamook" ;;
+            "5:9") cpu_codename_label="P5 (MMX)" ;;
+            "6:0" | "6:1" | "6:2") cpu_codename_label="P6 (Pentium II)" ;;
+            "6:3") cpu_codename_label="P6 (Klamath)" ;;
+            "6:5") cpu_codename_label="P6 (Deschutes)" ;;
+            "6:6") cpu_codename_label="P6 (Dixon)" ;;
+            "6:7") cpu_codename_label="P6 (Katmai)" ;;
+            "6:8") cpu_codename_label="P6 (Coppermine)" ;;
+            "6:9") cpu_codename_label="P6 (Pentium M)" ;;
+            "6:10") cpu_codename_label="P6 (Coppermine T)" ;;
+            "6:11") cpu_codename_label="P6 (Tualatin)" ;;
+            "6:13" | "6:21") cpu_codename_label="Dothan" ;;
+            "6:14") cpu_codename_label="Yonah" ;;
+            "6:15" | "6:22") cpu_codename_label="Merom" ;;
+            "6:23" | "6:29") cpu_codename_label="Penryn" ;;
+            "6:26" | "6:30" | "6:31" | "6:46") cpu_codename_label="Nehalem" ;;
+            "6:28" | "6:38") cpu_codename_label="Bonnell" ;;
+            "6:37" | "6:44" | "6:47") cpu_codename_label="Westmere" ;;
+            "6:39" | "6:53" | "6:54") cpu_codename_label="Saltwell" ;;
+            "6:42" | "6:45") cpu_codename_label="Sandy Bridge" ;;
+            "6:55" | "6:74" | "6:77" | "6:90" | "6:93") cpu_codename_label="Silvermont" ;;
+            "6:58" | "6:62") cpu_codename_label="Ivy Bridge" ;;
+            "6:60" | "6:63" | "6:69" | "6:70") cpu_codename_label="Haswell" ;;
+            "6:61" | "6:71" | "6:79" | "6:86") cpu_codename_label="Broadwell" ;;
+            "6:76" | "6:117") cpu_codename_label="Airmont" ;;
+            "6:78" | "6:85" | "6:94") cpu_codename_label="Skylake" ;;
+            "6:87") cpu_codename_label="Knights Landing" ;;
+            "6:92" | "6:95") cpu_codename_label="Goldmont" ;;
+            "6:102") cpu_codename_label="Palm Cove" ;;
+            "6:106" | "6:108" | "6:125" | "6:157") cpu_codename_label="Sunny Cove" ;;
+            "6:122") cpu_codename_label="Goldmont Plus" ;;
+            "6:126") cpu_codename_label="Ice Lake" ;;
+            "6:133") cpu_codename_label="Knights Mill" ;;
+            "6:134" | "6:138" | "6:150" | "6:156") cpu_codename_label="Tremont" ;;
+            "6:140" | "6:141") cpu_codename_label="Tiger Lake" ;;
+            "6:151" | "6:154" | "6:190") cpu_codename_label="Alder Lake" ;;
+            "6:165" | "6:166") cpu_codename_label="Comet Lake" ;;
+            "6:167") cpu_codename_label="Rocket Lake" ;;
+            "6:183" | "6:186" | "6:191") cpu_codename_label="Raptor Lake" ;;
+            "11:0") cpu_codename_label="Knights Ferry" ;;
+            "11:1") cpu_codename_label="Knights Corner" ;;
+            "15:0" | "15:1") cpu_codename_label="Willamette" ;;
+            "15:2") cpu_codename_label="Northwood" ;;
+            "15:3" | "15:4") cpu_codename_label="Prescott" ;;
+            "15:6") cpu_codename_label="Cedar Mill" ;;
+        esac
+    fi
+
+    [[ "$cpu_codename_label" ]] && printf '%s\n' "$cpu_codename_label"
+}
+
 get_gpu() {
     case $os in
         "Linux")
             # Read GPUs into array.
-            gpu_cmd="$(lspci -mm |
-                       awk -F '\"|\" \"|\\(' \
-                              '/"Display|"3D|"VGA/ {
-                                  a[$0] = $1 " " $3 " " ($(NF-1) ~ /^$|^Device [[:xdigit:]]+$/ ? $4 : $(NF-1))
-                              }
-                              END { for (i in a) {
-                                  if (!seen[a[i]]++) {
-                                      sub("^[^ ]+ ", "", a[i]);
-                                      print a[i]
-                                  }
-                              }}')"
-
-            if [[ "$gpu_cmd" == "" ]]; then
+            if [[ "$gpu_backend" == "glxinfo" ]]; then
                 gpu_cmd="$(glxinfo -B | grep -F 'OpenGL renderer string')"
                 gpu_cmd="${gpu_cmd/OpenGL renderer string: }"
+            else
+                gpu_cmd="$(lspci -mm |
+                           awk -F '\"|\" \"|\\(' \
+                                  '/"Display|"3D|"VGA/ {
+                                      a[$0] = $1 " " $3 " " ($3 ~ /Intel/ || $(NF-1) ~ /^$|^Device [[:xdigit:]]+$/ ? $4 : $(NF-1))
+                                  }
+                                  END { for (i in a) {
+                                      if (!seen[a[i]]++) {
+                                          sub("^[^ ]+ ", "", a[i]);
+                                          print a[i]
+                                      }
+                                  }}')"
+
+                if [[ "$gpu_cmd" == "" ]]; then
+                    gpu_cmd="$(glxinfo -B | grep -F 'OpenGL renderer string')"
+                    gpu_cmd="${gpu_cmd/OpenGL renderer string: }"
+                fi
             fi
 
             IFS=$'\n' read -d "" -ra gpus <<< "$gpu_cmd"
@@ -3528,6 +3793,18 @@ get_gpu() {
                         gpu="$brand $gpu"
                     ;;
 
+                    *"AMD"*|*"ATI"*|*"Radeon"*)
+                        gpu="${gpu/Advanced Micro Devices, Inc.}"
+                        gpu="${gpu/\[AMD\/ATI\] }"
+                        gpu="${gpu/\[AMD\] }"
+                        gpu="${gpu/OEM }"
+                        gpu="${gpu/ \(*}"
+                        gpu="$(trim "$gpu")"
+
+                        [[ "$gpu" != *"AMD"* && "$gpu" != *"ATI"* && "$gpu" == *"Radeon"* ]] && \
+                            gpu="AMD $gpu"
+                    ;;
+
                     *"NVIDIA"*)
                         gpu="${gpu/*NVIDIA}"
                         gpu="${gpu/*\[}"
@@ -3539,6 +3816,7 @@ get_gpu() {
                         gpu="${gpu/*Intel/Intel}"
                         gpu="${gpu/\(R\)}"
                         gpu="${gpu/Corporation}"
+                        [[ "$gpu" == *"["*"]"* ]] && gpu="Intel ${gpu/*\[}" && gpu="${gpu/\]*}"
                         gpu="${gpu/ \(*}"
                         gpu="${gpu/Integrated Graphics Controller}"
                         gpu="${gpu/*Xeon*/Intel HD Graphics}"
@@ -3693,6 +3971,8 @@ get_memory() {
         "Linux" | "Windows")
             # MemUsed = Memtotal + Shmem - MemFree - Buffers - Cached - SReclaimable
             # Source: https://github.com/KittyKatt/screenFetch/issues/386#issuecomment-249312716
+            mem_used=0
+            mem_avail=
             while IFS=":" read -r a b; do
                 case $a in
                     "MemTotal") ((mem_used+=${b/kB})); mem_total="${b/kB}" ;;
@@ -3701,15 +3981,13 @@ get_memory() {
                         mem_used="$((mem_used-${b/kB}))"
                     ;;
 
-                    # Available since Linux 3.14rc (34e431b0ae398fc54ea69ff85ec700722c9da773).
-                    # If detected this will be used over the above calculation for mem_used.
                     "MemAvailable")
                         mem_avail=${b/kB}
                     ;;
                 esac
             done < /proc/meminfo
 
-            [[ $mem_avail ]] && mem_used=$((mem_total - mem_avail))
+            [[ "$memory_report_available" == "on" && "$mem_avail" ]] && mem_used=$((mem_total - mem_avail))
         ;;
 
         "Mac OS X" | "macOS" | "iPhone OS")
@@ -3719,7 +3997,7 @@ get_memory() {
                 hw_pagesize="$(sysctl -n hw.pagesize)"
                 mem_total="$(($(sysctl -n hw.memsize) / 1024))"
                 pages_app="$(($(sysctl -n vm.page_pageable_internal_count) - $(sysctl -n vm.page_purgeable_count)))"
-                pages_wired="$(vm_stat | awk '/ wired/ { print $4 }')"
+                pages_wired="$(vm_stat | awk '/Pages wired down/ { print $4 }')"
                 pages_compressed="$(vm_stat | awk '/ occupied/ { printf $5 }')"
                 pages_compressed="${pages_compressed:-0}"
                 mem_used="$(((pages_app + ${pages_wired//.} + ${pages_compressed//.}) * hw_pagesize / 1024))"
@@ -4318,7 +4596,21 @@ get_resolution() {
                 resolution="$(xdpyinfo | awk '/dimensions:/ {printf $2}')"
 
             elif [[ -d /sys/class/drm ]]; then
+                local connector status enabled single_resolution
+
                 for dev in /sys/class/drm/*/modes; do
+                    [[ -e $dev ]] || continue
+
+                    connector=${dev%/modes}
+                    status=
+                    enabled=
+                    single_resolution=
+
+                    [[ -r "$connector/status" ]]  && read -r status _  < "$connector/status"
+                    [[ -r "$connector/enabled" ]] && read -r enabled _ < "$connector/enabled"
+
+                    [[ $status == "disconnected" || $enabled == "disabled" ]] && continue
+
                     read -r single_resolution _ < "$dev"
 
                     [[ $single_resolution ]] && resolution="${single_resolution}, ${resolution}"
@@ -5492,11 +5784,11 @@ get_cols() {
 
         # Convert the spaces into rows of blocks.
         if [ "${BASH_VERSION%%.*}" -lt 5 ]; then
-            [[ "$blocks"  ]] && cols+="${block_spaces// /${blocks}[39;49mnl}"
-            [[ "$blocks2" ]] && cols+="${block_spaces// /${blocks2}[0mnl}"
+            [[ "$blocks"  ]] && cols+="${block_spaces// /${blocks}\\e[39;49mnl}"
+            [[ "$blocks2" ]] && cols+="${block_spaces// /${blocks2}\\e[0mnl}"
         else
-            [[ "$blocks"  ]] && cols+="${block_spaces// /${blocks}\[39;49mnl}"
-            [[ "$blocks2" ]] && cols+="${block_spaces// /${blocks2}\[0mnl}"
+            [[ "$blocks"  ]] && cols+="${block_spaces// /${blocks}\\e\[39;49mnl}"
+            [[ "$blocks2" ]] && cols+="${block_spaces// /${blocks2}\\e\[0mnl}"
         fi
 
         # Determine the horizontal offset of the blocks.
@@ -5508,7 +5800,7 @@ get_cols() {
         # Add newlines to the string.
         cols=${cols%%nl}
         cols=${cols//nl/
-[${block_offset}C${zws}}
+\\e[${block_offset}C${zws}}
 
         # Add block height to info height.
         ((info_height+=block_range[1]>7?block_height+2:block_height+1))
@@ -5533,7 +5825,7 @@ image_backend() {
         "off") image_backend="off" ;;
 
         "caca" | "catimg" | "chafa" | "jp2a" | "iterm2" | "termpix" |\
-        "tycat" | "w3m" | "sixel" | "pixterm" | "kitty" | "pot", | "ueberzug" |\
+        "tycat" | "w3m" | "sixel" | "lowsixel" | "pixterm" | "kitty" | "pot", | "ueberzug" |\
          "viu")
             get_image_source
 
@@ -5560,8 +5852,8 @@ image_backend() {
         *)
             err "Image: Unknown image backend specified '$image_backend'."
             err "Image: Valid backends are: 'ascii', 'caca', 'catimg', 'chafa', 'jp2a', 'iterm2',
-                                            'kitty', 'off', 'sixel', 'pot', 'pixterm', 'termpix',
-                                            'tycat', 'w3m', 'viu')"
+                                            'kitty', 'off', 'sixel', 'lowsixel', 'pot', 'pixterm',
+                                            'termpix', 'tycat', 'w3m', 'viu')"
             err "Image: Falling back to ascii mode."
             print_ascii
         ;;
@@ -6048,6 +6340,13 @@ display_image() {
 
         "sixel")
             img2sixel -I \
+                -w "$width" \
+                -h "$height" \
+            "$image"
+        ;;
+
+        "lowsixel")
+            img2sixel \
                 -w "$width" \
                 -h "$height" \
             "$image"
@@ -6598,6 +6897,8 @@ INFO:
                                 1 GHz.
 
     --cpu_brand on/off          Enable/Disable CPU brand in output.
+    --cpu_codename on/off       Enable/Disable CPU codename in output.
+                                NOTE: This currently supports Linux with Intel x86 CPUs.
     --cpu_cores type            Whether or not to display the number of CPU cores
                                 Possible values: logical, physical, off
 
@@ -6623,9 +6924,12 @@ INFO:
     --refresh_rate on/off       Whether to display the refresh rate of each monitor
                                 Unsupported on Windows
     --gpu_brand on/off          Enable/Disable GPU brand in output. (AMD/NVIDIA/Intel)
+    --gpu_backend backend       Which GPU backend to use. (lspci, glxinfo)
     --gpu_type type             Which GPU to display. (all, dedicated, integrated)
 
                                 NOTE: This only supports Linux.
+                                NOTE: glxinfo only reports the GPU attached to the
+                                current display.
 
     --de_version on/off         Show/Hide Desktop Environment version
     --gtk_shorthand on/off      Shorten output of gtk theme/icons
@@ -6659,6 +6963,8 @@ INFO:
     --song_format format        Print the song data in a specific format (see config file).
     --song_shorthand on/off     Print the Artist/Album/Title on separate lines.
     --memory_percent on/off     Display memory percentage.
+    --memory_report_available on/off
+                                Report Linux used memory from MemAvailable.
     --memory_unit (k/m/g/t)ib   Memory output unit.
     --memory_precision integer  Change memory output precision. (≥0, default=2)
     --music_player player-name  Manually specify a player to use.
@@ -6696,7 +7002,7 @@ BARS:
 IMAGE BACKEND:
     --backend backend           Which image backend to use.
                                 Possible values: 'ascii', 'caca', 'catimg', 'chafa', 'jp2a',
-                                'iterm2', 'off', 'sixel', 'tycat', 'w3m', 'kitty', 'viu'
+                                'iterm2', 'off', 'sixel', 'lowsixel', 'tycat', 'w3m', 'kitty', 'viu'
     --source source             Which image or ascii file to use.
                                 Possible values: 'auto', 'ascii', 'wallpaper', '/path/to/img',
                                 '/path/to/ascii', '/path/to/dir/', 'command output' [ascii]
@@ -6711,6 +7017,7 @@ IMAGE BACKEND:
     --iterm2 source             Shortcut to use 'iterm2' backend.
     --jp2a source               Shortcut to use 'jp2a' backend.
     --kitty source              Shortcut to use 'kitty' backend.
+    --lowsixel source           Shortcut to use 'lowsixel' backend.
     --pot source                Shortcut to use 'pot' backend.
     --pixterm source            Shortcut to use 'pixterm' backend.
     --sixel source              Shortcut to use 'sixel' backend.
@@ -6757,9 +7064,9 @@ ASCII:
                                 Live Raizo, LMDE, Lubuntu, Lunar, mac, MacaroniOS, Mageia, Magix,
                                 MagpieOS, MainsailOS, Mandriva, Manjaro, MassOS, MatuusOS, Maui,
                                 Mauna, Meowix, Mer, MidOS, Minix, MIRACLE LINUX, MX, Namib, NekOS,
-                                Neptune, NetBSD, Netrunner, Nitrux, NixOS, nixos_colorful, Nobara, NomadBSD,
-                                Nurunner, NuTyX, Obarun, OBRevenge, OmniOS, Open Source Media
-                                Center, OpenBSD, openEuler, OpenIndiana, openKylin, openmamba,
+                                Neptune, NetBSD, Netrunner, Nitrux, NixOS, nixos_colorful, NixOwOS,
+                                Nobara, NomadBSD, Nurunner, NuTyX, Obarun, OBRevenge, OmniOS, Open Source
+                                Media Center, OpenBSD, openEuler, OpenIndiana, openKylin, openmamba,
                                 OpenMandriva, OpenSolaris, OpenStage, openSUSE, openSUSE Leap,
                                 openSUSE Tumbleweed, openSUSE Tumbleweed-Slowroll, OPNsense,
                                 Oracle, orchid, OS Elbrus, PacBSD, Panwah, Parabola, parch, Pardus,
@@ -6774,9 +7081,9 @@ ASCII:
                                 SharkLinux, ShastraOS, Siduction, SkiffOS, Slackel, Slackware,
                                 SliTaz, SmartOS, Soda, Solus, Source Mage, Sparky, Star, SteamOS,
                                 Stock Linux, Sulin, SunOS, SwagArch, t2, Tails, Tatra, TeArch,
-                                TorizonCore, Trisquel, Twister, Ubuntu, Ubuntu Budgie, Ubuntu
-                                Cinnamon, Ubuntu Kylin, Ubuntu MATE, Ubuntu Studio, Ubuntu Sway,
-                                Ubuntu Touch, Ubuntu-GNOME, ubuntu_old02, Ultramarine Linux,
+                                TorizonCore, Trisquel, Twister, Tuxedo OS, Ubuntu, Ubuntu Budgie,
+                                Ubuntu Cinnamon, Ubuntu Kylin, Ubuntu MATE, Ubuntu Studio, Ubuntu
+                                Sway, Ubuntu Touch, Ubuntu-GNOME, ubuntu_old02, Ultramarine Linux,
                                 unicodearch, Univalent, Univention, Uos, UrukOS, uwuntu, Vanilla,
                                 Venom, VNux, Void, VzLinux, wii-linux-ngx, Windows, Windows 10,
                                 Windows 11, Windows95, Wrt, Xenia, Xenia2, XFerience, Xray_OS,
@@ -6870,7 +7177,9 @@ get_args() {
             "--kernel_shorthand") kernel_shorthand="$2" ;;
             "--uptime_shorthand") uptime_shorthand="$2" ;;
             "--cpu_brand") cpu_brand="$2" ;;
+            "--cpu_codename") cpu_codename="$2" ;;
             "--gpu_brand") gpu_brand="$2" ;;
+            "--gpu_backend") gpu_backend="$2" ;;
             "--gpu_type") gpu_type="$2" ;;
             "--refresh_rate") refresh_rate="$2" ;;
             "--de_version") de_version="$2" ;;
@@ -6899,6 +7208,7 @@ get_args() {
             "--song_shorthand") song_shorthand="$2" ;;
             "--music_player") music_player="$2" ;;
             "--memory_percent") memory_percent="$2" ;;
+            "--memory_report_available") memory_report_available="$2" ;;
             "--memory_unit") memory_unit="$2" ;;
             "--memory_precision") mem_precision="$2" ;;
             "--cpu_temp")
@@ -6978,7 +7288,7 @@ get_args() {
             "--backend") image_backend="$2" ;;
             "--source") image_source="$2" ;;
             "--ascii" | "--caca" | "--catimg" | "--chafa" | "--jp2a" | "--iterm2" | "--off" |\
-            "--pot" | "--pixterm" | "--sixel" | "--termpix" | "--tycat" | "--w3m" | "--kitty" |\
+            "--pot" | "--pixterm" | "--sixel" | "--lowsixel" | "--termpix" | "--tycat" | "--w3m" | "--kitty" |\
             "--ueberzug" | "--viu")
                 image_backend="${1/--}"
                 case $2 in
@@ -7151,7 +7461,11 @@ get_distro_ascii() {
     # This function gets the distro ascii art and colors.
     #
     # $ascii_distro is the same as $distro.
-    case $(trim "$ascii_distro") in
+    local distro_ascii
+    distro_ascii=$(trim "$ascii_distro")
+
+    local IFS=
+    case $distro_ascii in
         "Adélie"* | "Adelie"*)
             set_colors 4 7 6
             read -rd '' ascii_data <<'EOF'
@@ -10292,6 +10606,27 @@ ${c1}            ,,:;;;;:,,
 EOF
         ;;
 
+        "FiwixOS"* | "Fiwix"*)
+            set_colors 45 45 18
+            read -rd '' ascii_data <<'EOF'
+ ${c1}###########.${c3}###########
+  ${c1}###########.${c3}###########
+   ${c1}###########.${c3}###########
+    ${c1}###########.${c3}###########
+      ${c1}##########.${c3}###########
+     ${c1}#############.${c3}##########
+    ${c1}###############.${c3}##########
+   ${c1}#################.${c3}##########
+    ${c1}###############.${c3}##########
+     ${c1}#############.${c3}##########
+      ${c1}###########.${c3}##########
+    ${c1}############.${c3}##########
+   ${c1}############.${c3}##########
+  ${c1}############.${c3}##########
+ ${c1}###########.${c3}##########
+EOF
+        ;;
+
         "Furreto"*)
             set_colors 211 255 225 199
             read -rd '' ascii_data <<'EOF'
@@ -12414,6 +12749,32 @@ ${c1}           ▟██████▙       ${c2}▜███▙
 ${c1}          ▟███▛▜███▙       ${c2}▜███▙
 ${c1}         ▟███▛  ▜███▙       ${c2}▜███▙
 ${c1}         ▝▀▀▀    ▀▀▀▀▘       ${c2}▀▀▀▘
+EOF
+        ;;
+
+        "NixOwOS"*)
+            set_colors "#5277c3" "#7ebae4" "#df90af" "#2d789e" "#5f92d3"
+            read -rd '' ascii_data <<'EOF'
+${c1}           ▗▄▄▄       ${c2}▗▄▄▄▄    ▄▄▄▖
+${c1}           ▜███▙       ${c2}▜███▙  ▟███▛
+${c1}            ▜███▙       ${c2}▜███▙▟███▛       ${c1}▗
+${c1}     ▐▄      ▜███▙       ${c2}▜██████▛    ${c1}▄▄▞▀▛
+${c1}      ▜▀▀▀▄▄  ▜█████████▙ ${c2}▜████▛  ${c1}▄█▛▀  ▗▘
+${c1}       ▌   ▀█▄▟██████████▙ ${c2}▜███▙${c1}▟█▛    ▗▞
+${c1}       ▐  ▙▖▟${c2}▙▄▄▖           ${c2}▜████${c1}▙▄▟▘  ▟▘
+${c1}        ▜▖▝█${c2}███▛             ${c2}▜██▛${c1}██▄▄▄▞▘
+${c1}         ▝${c2}▟███▛ ${c4}▀▚▄       ▄▞▀ ${c2}▜▛ ${c1}▟███▛
+${c2} ▟███████████▛ ${c4}▗▄▄▞▘     ▝▚▄▄▖  ${c1}▟██████████▙
+${c2} ▜██████████▛  ${c3}/// ${c4}▟▘ ▄ ▝▙ ${c3}/// ${c1}▟███████████▛
+${c2}       ▟███▛ ${c1}▟▙    ${c4}▜▄▟▀▙▄▛    ${c1}▟███▛
+${c2}      ▟███▛ ${c1}▟██▙             ${c1}▟███▛      ${c5}▄
+${c2}     ▟███▛  ${c1}▜███▙           ${c1}▝▀▀▀▀  ${c5}▗▄▛▀▀
+${c2}     ▜██▛  ▗▌${c1}▜███▙ ${c2}▜██████████████████▛
+${c2}      ▜▛  ▗▛ ${c1}▟████▙ ${c2}▜████████████████▛
+${c2}          ▝▌${c1}▟██████▙     ${c5}▄▄${c2}▜███▙
+${c1}           ▟███▛▜███▙${c2}▄▄▟${c5}▀▘  ${c2}▜███▙
+${c1}          ▟███▛${c2}▄▄${c1}▜███▙       ${c2}▜███▙
+${c1}          ▝▀▀▀    ▀▀▀▀▘       ${c2}▀▀▀▘
 EOF
         ;;
 
@@ -15024,6 +15385,28 @@ ${c3}.................${c5},l;;XgggggXP:'${c4}...............
 ${c3}................${c5};lco;::::::'${c4}..................
 ${c3}..............${c5}.';ggggol'`${c4}.....................
 ${c3}.............${c5}':oo:''${c3}...${c4}.......................
+EOF
+        ;;
+
+        "TUXEDO OS"* | "Tuxedo OS"* | "tuxedo"*)
+            set_colors 7 1
+            read -rd '' ascii_data <<'EOF'
+${c1} #############################+
+.%#######################%@@@+
+            .           :#@%-
+           .#@%%%-     =@@#.
+             *@%@@=   +@@+
+              =@@%@+.#@%-
+               -@@%@@@#:
+                .#@%%@-
+                :#@@%@@=
+               =@@+=@@%@+
+             .#@@=  -@@%@#
+            -%@#:    :%@%@%:
+           *@@+       .#%%%%-
+         :%@%-              .
+        +@@@%#%%%%%%%%%%%%%%%%%%%%%%%.
+       +######################*******
 EOF
         ;;
 

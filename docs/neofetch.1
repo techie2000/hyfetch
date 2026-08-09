@@ -71,6 +71,11 @@ NOTE: This flag is not supported in systems with CPU speed less than
 \fB\-\-cpu_brand\fR on/off
 Enable/Disable CPU brand in output.
 .TP
+\fB\-\-cpu_codename\fR on/off
+Enable/Disable CPU codename in output.
+.IP
+NOTE: This currently supports Linux with Intel x86 CPUs.
+.TP
 \fB\-\-cpu_cores\fR type
 Whether or not to display the number of CPU cores
 Possible values: logical, physical, off
@@ -108,10 +113,15 @@ Unsupported on Windows
 \fB\-\-gpu_brand\fR on/off
 Enable/Disable GPU brand in output. (AMD/NVIDIA/Intel)
 .TP
+\fB\-\-gpu_backend\fR backend
+Which GPU backend to use. (lspci, glxinfo)
+.TP
 \fB\-\-gpu_type\fR type
 Which GPU to display. (all, dedicated, integrated)
 .IP
 NOTE: This only supports Linux.
+.IP
+NOTE: glxinfo only reports the GPU attached to the current display.
 .TP
 \fB\-\-de_version\fR on/off
 Show/Hide Desktop Environment version
@@ -175,6 +185,9 @@ Print the Artist/Album/Title on separate lines.
 .TP
 \fB\-\-memory_percent\fR on/off
 Display memory percentage.
+.TP
+\fB\-\-memory_report_available\fR on/off
+Report Linux used memory from MemAvailable.
 .TP
 \fB\-\-memory_unit\fR (k/m/g/t)ib
 Memory output unit.
@@ -249,7 +262,7 @@ Possible values: bar, infobar, barinfo, off
 \fB\-\-backend\fR backend
 Which image backend to use.
 Possible values: 'ascii', 'caca', 'catimg', 'chafa', 'jp2a',
-\&'iterm2', 'off', 'sixel', 'tycat', 'w3m', 'kitty', 'viu'
+\&'iterm2', 'off', 'sixel', 'lowsixel', 'tycat', 'w3m', 'kitty', 'viu'
 .TP
 \fB\-\-source\fR source
 Which image or ascii file to use.
@@ -278,6 +291,9 @@ Shortcut to use 'jp2a' backend.
 .TP
 \fB\-\-kitty\fR source
 Shortcut to use 'kitty' backend.
+.TP
+\fB\-\-lowsixel\fR source
+Shortcut to use 'lowsixel' backend.
 .TP
 \fB\-\-pot\fR source
 Shortcut to use 'pot' backend.
@@ -345,9 +361,9 @@ Linux, Linux Lite, Linux Mint, Linux Mint Old, LinuxFromScratch,
 Live Raizo, LMDE, Lubuntu, Lunar, mac, MacaroniOS, Mageia, Magix,
 MagpieOS, MainsailOS, Mandriva, Manjaro, MassOS, MatuusOS, Maui,
 Mauna, Meowix, Mer, MidOS, Minix, MIRACLE LINUX, MX, Namib, NekOS,
-Neptune, NetBSD, Netrunner, Nitrux, NixOS, nixos_colorful, Nobara, NomadBSD,
-Nurunner, NuTyX, Obarun, OBRevenge, OmniOS, Open Source Media
-Center, OpenBSD, openEuler, OpenIndiana, openKylin, openmamba,
+Neptune, NetBSD, Netrunner, Nitrux, NixOS, nixos_colorful, NixOwOS,
+Nobara, NomadBSD, Nurunner, NuTyX, Obarun, OBRevenge, OmniOS, Open Source
+Media Center, OpenBSD, openEuler, OpenIndiana, openKylin, openmamba,
 OpenMandriva, OpenSolaris, OpenStage, openSUSE, openSUSE Leap,
 openSUSE Tumbleweed, openSUSE Tumbleweed\-Slowroll, OPNsense, Oracle,
 orchid, OS Elbrus, PacBSD, Panwah, Parabola, parch, Pardus, Parrot,
@@ -361,9 +377,9 @@ OS, Salix, Sasanqua, Scientific, secureblue, semc, Septor, Serene,
 SharkLinux, ShastraOS, Siduction, SkiffOS, Slackel, Slackware,
 SliTaz, SmartOS, Soda, Solus, Source Mage, Sparky, Star, SteamOS,
 Stock Linux, Sulin, SunOS, SwagArch, t2, Tails, Tatra, TeArch,
-TorizonCore, Trisquel, Twister, Ubuntu, Ubuntu Budgie, Ubuntu
-Cinnamon, Ubuntu Kylin, Ubuntu MATE, Ubuntu Studio, Ubuntu Sway,
-Ubuntu Touch, Ubuntu\-GNOME, ubuntu_old02, Ultramarine Linux,
+TorizonCore, Trisquel, Twister, Tuxedo OS, Ubuntu, Ubuntu Budgie,
+Ubuntu Cinnamon, Ubuntu Kylin, Ubuntu MATE, Ubuntu Studio, Ubuntu
+Sway, Ubuntu Touch, Ubuntu\-GNOME, ubuntu_old02, Ultramarine Linux,
 unicodearch, Univalent, Univention, Uos, UrukOS, uwuntu, Vanilla,
 Venom, VNux, Void, VzLinux, wii\-linux\-ngx, Windows, Windows 10,
 Windows 11, Windows95, Wrt, Xenia, Xenia2, XFerience, Xray_OS,
